@@ -9,6 +9,7 @@ const (
 	ProviderBing   ProviderName = "bing"
 	ProviderGoogle ProviderName = "google"
 	ProviderBocha  ProviderName = "bocha"
+	ProviderTavily ProviderName = "tavily"
 )
 
 type ProviderConfigSchema struct {

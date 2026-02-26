@@ -61,6 +61,7 @@ import (
 	"github.com/memohai/memoh/internal/policy"
 	"github.com/memohai/memoh/internal/preauth"
 	"github.com/memohai/memoh/internal/providers"
+	"github.com/memohai/memoh/internal/heartbeat"
 	"github.com/memohai/memoh/internal/schedule"
 	"github.com/memohai/memoh/internal/searchproviders"
 	"github.com/memohai/memoh/internal/server"
@@ -180,6 +181,8 @@ func runServe() {
 			provideChatResolver,
 			provideScheduleTriggerer,
 			schedule.NewService,
+			provideHeartbeatTriggerer,
+			heartbeat.NewService,
 
 			// containerd handler & tool gateway
 			provideContainerdHandler,
@@ -199,6 +202,7 @@ func runServe() {
 			provideServerHandler(handlers.NewPreauthHandler),
 			provideServerHandler(handlers.NewBindHandler),
 			provideServerHandler(handlers.NewScheduleHandler),
+			provideServerHandler(handlers.NewHeartbeatHandler),
 			provideServerHandler(handlers.NewSubagentHandler),
 			provideServerHandler(handlers.NewChannelHandler),
 			provideServerHandler(feishu.NewWebhookServerHandler),
@@ -213,6 +217,7 @@ func runServe() {
 		fx.Invoke(
 			startMemoryWarmup,
 			startScheduleService,
+			startHeartbeatService,
 			startChannelManager,
 			startContainerReconciliation,
 			startServer,
@@ -373,6 +378,10 @@ func provideScheduleTriggerer(resolver *flow.Resolver) schedule.Triggerer {
 	return flow.NewScheduleGateway(resolver)
 }
 
+func provideHeartbeatTriggerer(resolver *flow.Resolver) heartbeat.Triggerer {
+	return flow.NewHeartbeatGateway(resolver)
+}
+
 // ---------------------------------------------------------------------------
 // conversation flow
 // ---------------------------------------------------------------------------
@@ -391,13 +400,18 @@ func provideChatResolver(log *slog.Logger, cfg config.Config, modelsService *mod
 
 func provideChannelRegistry(log *slog.Logger, hub *local.RouteHub, mediaService *media.Service) *channel.Registry {
 	registry := channel.NewRegistry()
+
+	// Telegram
 	tgAdapter := telegram.NewTelegramAdapter(log)
 	tgAdapter.SetAssetOpener(mediaService)
 	registry.MustRegister(tgAdapter)
-	registry.MustRegister(discord.NewDiscordAdapter(log))
-	feishuAdapter := feishu.NewFeishuAdapter(log)
-	feishuAdapter.SetAssetOpener(mediaService)
-	registry.MustRegister(feishuAdapter)
+
+	// Discord
+	discordAdapter := discord.NewDiscordAdapter(log)
+	discordAdapter.SetAssetOpener(mediaService)
+	registry.MustRegister(discordAdapter)
+
+	registry.MustRegister(feishu.NewFeishuAdapter(log))
 	registry.MustRegister(local.NewCLIAdapter(hub))
 	registry.MustRegister(local.NewWebAdapter(hub))
 	return registry
@@ -560,6 +574,14 @@ func startScheduleService(lc fx.Lifecycle, scheduleService *schedule.Service) {
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			return scheduleService.Bootstrap(ctx)
+		},
+	})
+}
+
+func startHeartbeatService(lc fx.Lifecycle, heartbeatService *heartbeat.Service) {
+	lc.Append(fx.Hook{
+		OnStart: func(ctx context.Context) error {
+			return heartbeatService.Bootstrap(ctx)
 		},
 	})
 }

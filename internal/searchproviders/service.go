@@ -150,6 +150,34 @@ func (s *Service) ListMeta(_ context.Context) []ProviderMeta {
 				},
 			},
 		},
+		{
+			Provider:    string(ProviderTavily),
+			DisplayName: "Tavily",
+			ConfigSchema: ProviderConfigSchema{
+				Fields: map[string]ProviderFieldSchema{
+					"api_key": {
+						Type:        "secret",
+						Title:       "API Key",
+						Description: "Tavily Search API key",
+						Required:    true,
+					},
+					"base_url": {
+						Type:        "string",
+						Title:       "Base URL",
+						Description: "Tavily API base URL",
+						Required:    false,
+						Example:     "https://api.tavily.com/search",
+					},
+					"timeout_seconds": {
+						Type:        "number",
+						Title:       "Timeout (seconds)",
+						Description: "HTTP timeout in seconds",
+						Required:    false,
+						Example:     15,
+					},
+				},
+			},
+		},
 	}
 }
 
@@ -281,7 +309,7 @@ func (s *Service) toGetResponse(row sqlc.SearchProvider) GetResponse {
 func isValidProviderName(name ProviderName) bool {
 	switch name {
 	case ProviderBrave, ProviderBing, ProviderGoogle,
-		ProviderYandex:
+		ProviderYandex, ProviderTavily:
 		return true
 	default:
 		return false

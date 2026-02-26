@@ -3,16 +3,19 @@
  *
  * To add a new provider icon:
  * 1. Find the icon in FontAwesome (https://fontawesome.com/icons)
+ *    or define a custom icon in `custom-icons.ts`
  * 2. Import it in `main.ts` and add to `library.add()`
  * 3. Add the [prefix, iconName] tuple to PROVIDER_ICONS below
  *
  * The key must match the `provider` field stored in the database (lowercase).
+ * Prefix 'fab' = FA brands, 'fac' = custom icons defined in custom-icons.ts.
  */
 
 const PROVIDER_ICONS: Record<string, [string, string]> = {
   brave: ['fab', 'brave'],
   bing: ['fab', 'microsoft'],
   google: ['fab', 'google'],
+  tavily: ['fac', 'tavily'],
 }
 
 const DEFAULT_ICON: [string, string] = ['fas', 'globe']

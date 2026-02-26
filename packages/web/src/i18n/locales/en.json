@@ -201,7 +201,8 @@
       "brave": "Brave",
       "bing": "Bing",
       "google": "Google",
-      "jina": "Jina"
+      "jina": "Jina",
+      "tavily": "Tavily"
     }
   },
   "mcp": {

@@ -201,7 +201,8 @@
       "brave": "Brave",
       "bing": "Bing",
       "google": "Google",
-      "searxng": "SearXNG"
+      "searxng": "SearXNG",
+      "tavily": "Tavily"
     }
   },
   "mcp": {

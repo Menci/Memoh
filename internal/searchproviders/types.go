@@ -8,7 +8,11 @@ const (
 	ProviderBrave  ProviderName = "brave"
 	ProviderBing   ProviderName = "bing"
 	ProviderGoogle ProviderName = "google"
+<<<<<<< HEAD
 	ProviderExa    ProviderName = "exa"
+=======
+	ProviderTavily ProviderName = "tavily"
+>>>>>>> origin/main
 )
 
 type ProviderConfigSchema struct {

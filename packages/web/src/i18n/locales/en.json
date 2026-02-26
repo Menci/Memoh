@@ -201,7 +201,11 @@
       "brave": "Brave",
       "bing": "Bing",
       "google": "Google",
+<<<<<<< HEAD
       "exa": "Exa"
+=======
+      "tavily": "Tavily"
+>>>>>>> origin/main
     }
   },
   "mcp": {

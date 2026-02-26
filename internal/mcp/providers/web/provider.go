@@ -109,8 +109,13 @@ func (p *Executor) callWebSearch(ctx context.Context, providerName string, confi
 		return p.callBingSearch(ctx, configJSON, query, count)
 	case string(searchproviders.ProviderGoogle):
 		return p.callGoogleSearch(ctx, configJSON, query, count)
+<<<<<<< HEAD
 	case string(searchproviders.ProviderExa):
 		return p.callExaSearch(ctx, configJSON, query, count)
+=======
+	case string(searchproviders.ProviderTavily):
+		return p.callTavilySearch(ctx, configJSON, query, count)
+>>>>>>> origin/main
 	default:
 		return mcpgw.BuildToolErrorResult("unsupported search provider"), nil
 	}
@@ -305,6 +310,7 @@ func (p *Executor) callGoogleSearch(ctx context.Context, configJSON []byte, quer
 	}), nil
 }
 
+<<<<<<< HEAD
 func (p *Executor) callExaSearch(ctx context.Context, configJSON []byte, query string, count int) (map[string]any, error) {
 	cfg := parseConfig(configJSON)
 	endpoint := firstNonEmpty(stringValue(cfg["base_url"]), "https://api.exa.ai/search")
@@ -320,6 +326,18 @@ func (p *Executor) callExaSearch(ctx context.Context, configJSON []byte, query s
 			"highlights": true,
 		},
 		"type": "auto",
+=======
+func (p *Executor) callTavilySearch(ctx context.Context, configJSON []byte, query string, count int) (map[string]any, error) {
+	cfg := parseConfig(configJSON)
+	endpoint := firstNonEmpty(stringValue(cfg["base_url"]), "https://api.tavily.com/search")
+	apiKey := stringValue(cfg["api_key"])
+	if apiKey == "" {
+		return mcpgw.BuildToolErrorResult("Tavily API key is required"), nil
+	}
+	payload, _ := json.Marshal(map[string]any{
+		"query":       query,
+		"max_results": count,
+>>>>>>> origin/main
 	})
 	timeout := parseTimeout(configJSON, 15*time.Second)
 	client := &http.Client{Timeout: timeout}
@@ -344,9 +362,15 @@ func (p *Executor) callExaSearch(ctx context.Context, configJSON []byte, query s
 	}
 	var raw struct {
 		Results []struct {
+<<<<<<< HEAD
 			Title string `json:"title"`
 			URL   string `json:"url"`
 			Text  string `json:"text"`
+=======
+			Title   string `json:"title"`
+			URL     string `json:"url"`
+			Content string `json:"content"`
+>>>>>>> origin/main
 		} `json:"results"`
 	}
 	if err := json.Unmarshal(body, &raw); err != nil {
@@ -357,7 +381,11 @@ func (p *Executor) callExaSearch(ctx context.Context, configJSON []byte, query s
 		results = append(results, map[string]any{
 			"title":       item.Title,
 			"url":         item.URL,
+<<<<<<< HEAD
 			"description": item.Text,
+=======
+			"description": item.Content,
+>>>>>>> origin/main
 		})
 	}
 	return mcpgw.BuildToolSuccessResult(map[string]any{

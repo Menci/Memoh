@@ -197,7 +197,8 @@
       "brave": "Brave",
       "bing": "Bing",
       "google": "Google",
-      "serper": "Serper"
+      "serper": "Serper",
+      "tavily": "Tavily"
     }
   },
   "mcp": {

@@ -197,7 +197,8 @@
       "brave": "Brave",
       "bing": "Bing",
       "google": "Google",
-      "duckduckgo": "DuckDuckGo"
+      "duckduckgo": "DuckDuckGo",
+      "tavily": "Tavily"
     }
   },
   "mcp": {

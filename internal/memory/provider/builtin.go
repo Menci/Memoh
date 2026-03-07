@@ -100,6 +100,12 @@ func (p *BuiltinProvider) OnBeforeChat(ctx context.Context, req BeforeChatReques
 	}
 	results := make([]contextItem, 0, memoryContextLimitPerScope)
 	for _, item := range resp.Results {
+		// Skip memories extracted from assistant replies — they are
+		// semantically richer and dominate vector search results,
+		// drowning out the user-provided facts we actually want.
+		if isAssistantMemory(item.Memory) {
+			continue
+		}
 		key := strings.TrimSpace(item.ID)
 		if key == "" {
 			key = sharedMemoryNamespace + ":" + strings.TrimSpace(item.Memory)
@@ -376,6 +382,15 @@ func (p *BuiltinProvider) Usage(ctx context.Context, filters map[string]any) (Us
 }
 
 // --- helpers ---
+
+// isAssistantMemory checks whether a memory entry originated from an assistant
+// reply. The external memory service prefixes extracted facts with a role tag
+// like "[ASSISTANT]".
+func isAssistantMemory(memory string) bool {
+	trimmed := strings.TrimSpace(memory)
+	return len(trimmed) > len("[ASSISTANT]") &&
+		strings.EqualFold(trimmed[:len("[ASSISTANT]")], "[ASSISTANT]")
+}
 
 func truncateSnippet(s string, n int) string {
 	trimmed := strings.TrimSpace(s)

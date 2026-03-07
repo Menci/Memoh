@@ -1714,13 +1714,16 @@ func (r *Resolver) storeMemory(ctx context.Context, botID string, messages []con
 func toProviderMessages(messages []conversation.ModelMessage) []memprovider.Message {
 	out := make([]memprovider.Message, 0, len(messages))
 	for _, msg := range messages {
+		role := strings.TrimSpace(msg.Role)
+		// Only store user messages for memory extraction. Assistant replies
+		// are typically longer and semantically richer, causing vector search
+		// to almost always match the bot's own output instead of user facts.
+		if role != "user" {
+			continue
+		}
 		text := strings.TrimSpace(msg.TextContent())
 		if text == "" {
 			continue
-		}
-		role := strings.TrimSpace(msg.Role)
-		if role == "" {
-			role = "assistant"
 		}
 		out = append(out, memprovider.Message{Role: role, Content: text})
 	}
